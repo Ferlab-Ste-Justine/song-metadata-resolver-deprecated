@@ -13,14 +13,19 @@ const {
 
 const client = new Client({ node: load_mandatory_str_env_var('ELASTISEARCH_URL') })
 
-const process_result = R.curry((submittedSampleId, result) => {
-    const sample = eUtils.resultAccesors.sampleWithSubmitterId(submitterId)(result)
-    sample_specimen = eUtils.resultAccesors.specimenWithId(
-        eUtils.sampleAccesors.parentSpecimentId(sample)
+const capitalize = R.compose(
+    R.join(''),
+    R.juxt([R.compose(R.toUpper, R.head), R.tail])
+);
+
+const process_result = R.curry((submitterSampleId, result) => {
+    const sample = eUtils.resultAccessors.sampleWithSubmitterId(submitterSampleId)(result)
+    sample_specimen = eUtils.resultAccessors.specimenWithId(
+        eUtils.sampleAccessors.parentSpecimenId(sample)
     )(result)
     return {
         'submitterSampleId': submitterSampleId,
-        'sampleType': eUtils.sampleAccesors.type(sample),
+        'sampleType': eUtils.sampleAccessors.type(sample),
         'specimen': {
             'submitterSpecimenId': eUtils.specimenAccessors.submitterId(sample_specimen),
             'specimenType': 'Normal',
@@ -28,24 +33,24 @@ const process_result = R.curry((submittedSampleId, result) => {
             'tumourNormalDesignation': 'Normal'
         },
         'donor': {
-            'submitterDonorId': eUtils.resultAccesors.patientSubmitterId(result),
-            'studyId': eUtils.resultAccesors.studyId(result),
-            'gender': eUtils.resultAccesors.patientGender(result).capitalize()
+            'submitterDonorId': eUtils.resultAccessors.patientSubmitterId(result),
+            'studyId': eUtils.resultAccessors.studyId(result),
+            'gender': capitalize(eUtils.resultAccessors.patientGender(result))
         }
     }
 })
 
-const get_sample_song_metadata  = async (submittedSampleId, studyId) => {
+const get_sample_song_metadata  = async (submitterSampleId, studyId) => {
     const search = eUtils.generate_patient_and_search({
         "studies.id":  studyId,
-        "samples.container":  submittedSampleId
+        "samples.container":  submitterSampleId
     })
     try {
         const { body } = await client.search(search)
         return R.compose(
             (result) => Promise.resolve(result),
             eUtils.get_from_first_result(
-                process_result(submittedSampleId)
+                process_result(submitterSampleId)
             )
         )(body)
     } catch(err) {

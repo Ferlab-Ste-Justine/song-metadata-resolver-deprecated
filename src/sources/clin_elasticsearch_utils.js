@@ -33,7 +33,7 @@ const matchingID = (id) => R.compose(
     )
 ) 
 
-const resultAccesors = {
+const resultAccessors = {
     specimenWithId: (id) => R.compose(
         matchingID(id),
         R.prop('specimens')
@@ -53,7 +53,7 @@ const resultAccesors = {
 }
 
 const sampleAccessors = {
-    parentSpecimentId: R.path(['parent', 'id']),
+    parentSpecimenId: R.path(['parent', 'id']),
     type: R.path(['type', 'text'])
 }
 
@@ -136,7 +136,7 @@ const generate_patient_and_search = R.compose(
 
 module.exports = {
     responseAccessors,
-    resultAccesors,
+    resultAccessors,
     sampleAccessors,
     specimenAccessors,
     generate_patient_search,
