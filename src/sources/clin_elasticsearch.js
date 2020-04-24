@@ -24,15 +24,21 @@ const process_result = R.curry((submitterSampleId, result) => {
         eUtils.sampleAccessors.parentSpecimenId(sample)
     )(result)
     return {
+        'matchedNormalSubmitterSampleId': null,
+        'sampleId': null, //Could be resolved here, but SONG expects to make a separate call to an ID service
+        'specimenId': null, //Could be resolved here, but SONG expects to make a separate call to an ID service
         'submitterSampleId': submitterSampleId,
         'sampleType': eUtils.sampleAccessors.type(sample),
         'specimen': {
+            'donorId': null, //Could be resolved here, but SONG expects to make a separate call to an ID service
+            'specimenId': null, //Could be resolved here, but SONG expects to make a separate call to an ID service
             'submitterSpecimenId': eUtils.specimenAccessors.submitterId(sample_specimen),
             'specimenType': 'Normal',
             'specimenTissueSource': eUtils.specimenAccessors.type(sample_specimen),
             'tumourNormalDesignation': 'Normal'
         },
         'donor': {
+            'donorId': null, //Could be resolved here, but SONG expects to make a separate call to an ID service
             'submitterDonorId': eUtils.resultAccessors.patientSubmitterId(result),
             'studyId': eUtils.resultAccessors.studyId(result),
             'gender': capitalize(eUtils.resultAccessors.patientGender(result))
